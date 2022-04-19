@@ -1,6 +1,8 @@
 # ImGui Knobs
 This is a port/adaptation of [imgui-rs-knobs](https://github.com/DGriffin91/imgui-rs-knobs), for C++ with slightly changed API.
 
+![image](https://user-images.githubusercontent.com/956928/164050142-96a8dde4-7d2e-43e4-9afe-14ab48eac243.png)
+
 ## Usage
 Add `imgui-knobs.cpp` and `imgui-knobs.h` to your project and include `imgui-knobs.h` in some source file, then:
 
