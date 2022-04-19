@@ -191,7 +191,7 @@ namespace ImGuiKnobs {
                     bezier_count);
         }
 
-        knob knob_with_drag(const char *label, float *p_value, float v_min, float v_max, float v_default, const char *format, float size) {
+        knob knob_with_drag(const char *label, float *p_value, float v_min, float v_max, float v_default, const char *format, float size, ImGuiKnobFlags flags) {
             ImGui::PushID(label);
             auto width = size == 0 ? ImGui::GetTextLineHeight() * 4.0f : size * ImGui::GetIO().FontGlobalScale;
             ImGui::PushItemWidth(width);
@@ -202,17 +202,27 @@ namespace ImGuiKnobs {
             // This is probably not the best solution, but seems to work for now
             ImGui::GetCurrentWindow()->DC.CurrLineTextBaseOffset = 0;
 
-            // Draw title
-            auto title_size = ImGui::CalcTextSize(label, NULL, false, width);
+            if (!(flags & ImGuiKnobFlags_NoTitle)) {
+                // Draw title
+                auto title_size = ImGui::CalcTextSize(label, NULL, false, width);
 
-            // Center title
-            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (width - title_size[0]) * 0.5f);
+                // Center title
+                ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (width - title_size[0]) * 0.5f);
 
-            ImGui::Text("%s", label);
+                ImGui::Text("%s", label);
+            }
 
             knob k(label, p_value, v_min, v_max, v_default, width * 0.5f);
 
-            ImGui::DragScalar("###knob_drag", ImGuiDataType_Float, p_value, (v_max - v_min) / 1000.f, &v_min, &v_max, format);
+            if (flags & ImGuiKnobFlags_ValueTooltip && (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled) || ImGui::IsItemActive())) {
+                ImGui::BeginTooltip();
+                ImGui::Text(format, *p_value);
+                ImGui::EndTooltip();
+            }
+
+            if (!(flags & ImGuiKnobFlags_NoInput)) {
+                ImGui::DragScalar("###knob_drag", ImGuiDataType_Float, p_value, (v_max - v_min) / 1000.f, &v_min, &v_max, format);
+            }
 
             ImGui::EndGroup();
             ImGui::PopItemWidth();
@@ -243,7 +253,7 @@ namespace ImGuiKnobs {
 
     // Knob implementations
     KNOB_WIDGET(WiperKnob) {
-        auto knob = detail::knob_with_drag(title, p_value, v_min, v_max, 0, format, size);
+        auto knob = detail::knob_with_drag(title, p_value, v_min, v_max, 0, format, size, flags);
         knob.draw_circle(0.7, detail::GetSecondaryColorSet(), true, 32);
         knob.draw_arc(0.8, 0.41, knob.angle_min, knob.angle_max, detail::GetTrackColorSet(), 16, 2);
 
@@ -254,7 +264,7 @@ namespace ImGuiKnobs {
     }
 
     KNOB_WIDGET(WiperOnlyKnob) {
-        auto knob = detail::knob_with_drag(title, p_value, v_min, v_max, 0, format, size);
+        auto knob = detail::knob_with_drag(title, p_value, v_min, v_max, 0, format, size, flags);
         knob.draw_arc(0.8, 0.41, knob.angle_min, knob.angle_max, detail::GetTrackColorSet(), 32, 2);
 
         if (knob.t > 0.01) {
@@ -264,7 +274,7 @@ namespace ImGuiKnobs {
     }
 
     KNOB_WIDGET(WiperDotKnob) {
-        auto knob = detail::knob_with_drag(title, p_value, v_min, v_max, 0, format, size);
+        auto knob = detail::knob_with_drag(title, p_value, v_min, v_max, 0, format, size, flags);
         knob.draw_circle(0.6, detail::GetSecondaryColorSet(), true, 32);
         knob.draw_arc(0.85, 0.41, knob.angle_min, knob.angle_max, detail::GetTrackColorSet(), 16, 2);
         knob.draw_dot(0.1, 0.85, knob.angle, detail::GetPrimaryColorSet(), true, 12);
@@ -273,21 +283,21 @@ namespace ImGuiKnobs {
 
 
     KNOB_WIDGET(TickKnob) {
-        auto knob = detail::knob_with_drag(title, p_value, v_min, v_max, 0, format, size);
+        auto knob = detail::knob_with_drag(title, p_value, v_min, v_max, 0, format, size, flags);
         knob.draw_circle(0.7, detail::GetSecondaryColorSet(), true, 32);
         knob.draw_tick(0.4, 0.7, 0.08, knob.angle, detail::GetPrimaryColorSet());
         return knob.value_changed;
     }
 
     KNOB_WIDGET(DotKnob) {
-        auto knob = detail::knob_with_drag(title, p_value, v_min, v_max, 0, format, size);
+        auto knob = detail::knob_with_drag(title, p_value, v_min, v_max, 0, format, size, flags);
         knob.draw_circle(0.85, detail::GetSecondaryColorSet(), true, 32);
         knob.draw_dot(0.12, 0.6, knob.angle, detail::GetPrimaryColorSet(), true, 12);
         return knob.value_changed;
     }
 
     KNOB_WIDGET(SpaceKnob) {
-        auto knob = detail::knob_with_drag(title, p_value, v_min, v_max, 0, format, size);
+        auto knob = detail::knob_with_drag(title, p_value, v_min, v_max, 0, format, size, flags);
         knob.draw_circle(0.3 - knob.t * 0.1, detail::GetSecondaryColorSet(), true, 16);
 
         if (knob.t > 0.01) {
@@ -300,7 +310,7 @@ namespace ImGuiKnobs {
     }
 
     KNOB_WIDGET(SteppedKnob, int steps) {
-        auto knob = detail::knob_with_drag(title, p_value, v_min, v_max, 0, format, size);
+        auto knob = detail::knob_with_drag(title, p_value, v_min, v_max, 0, format, size, flags);
         for (auto n = 0.f; n < steps; n++) {
             auto a = n / (steps - 1);
             auto angle = knob.angle_min + (knob.angle_max - knob.angle_min) * a;

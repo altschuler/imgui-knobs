@@ -3,10 +3,19 @@
 #include <imgui.h>
 #include <utility>
 
-#define KNOB_WIDGET_DEF(name, ...) bool name(const char *title, float *p_value, float v_min, float v_max, const char *format, float size = 0, ##__VA_ARGS__)
-#define KNOB_WIDGET(name, ...) bool name(const char *title, float *p_value, float v_min, float v_max, const char *format, float size, ##__VA_ARGS__)
+typedef int ImGuiKnobFlags;
+
+#define KNOB_WIDGET_DEF(name, ...) bool name(const char *title, float *p_value, float v_min, float v_max, const char *format, float size = 0, ImGuiKnobFlags flags = 0, ##__VA_ARGS__)
+#define KNOB_WIDGET(name, ...) bool name(const char *title, float *p_value, float v_min, float v_max, const char *format, float size, ImGuiKnobFlags flags, ##__VA_ARGS__)
+
+enum ImGuiKnobFlags_ {
+    ImGuiKnobFlags_NoTitle = 1 << 0,
+    ImGuiKnobFlags_NoInput = 1 << 1,
+    ImGuiKnobFlags_ValueTooltip = 1 << 2
+};
 
 namespace ImGuiKnobs {
+
     struct color_set {
         ImColor base;
         ImColor hovered;
@@ -55,8 +64,8 @@ namespace ImGuiKnobs {
             void draw_arc(float arc_radius, float size, float start_angle, float end_angle, color_set color, int segments, int bezier_count);
         };
 
-        bool knob_control(const char *id, float *p_value, float v_min, float v_max, float v_default, float radius);
-        knob knob_with_drag(const char *title, float *p_value, float v_min, float v_max, float v_default, const char *format, float size = 0);
+        bool knob_control(const char *id, float *p_value, float v_min, float v_max, float v_default, float radius, ImGuiKnobFlags flags);
+        knob knob_with_drag(const char *title, float *p_value, float v_min, float v_max, float v_default, const char *format, float size = 0, ImGuiKnobFlags flags = 0);
 
         color_set GetPrimaryColorSet();
         color_set GetSecondaryColorSet();
