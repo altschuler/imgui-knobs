@@ -111,8 +111,9 @@ namespace ImGuiKnobs {
             auto _t = (*_p_value - _v_min) / (_v_max - _v_min);
             auto _angle = _angle_min + (_angle_max - _angle_min) * _t;
             auto _value_changed = false;
-            auto _screen_pos = ImGui::GetCursorScreenPos();
+            auto screen_pos = ImGui::GetCursorScreenPos();
 
+            // Make an invisble button that handles drag behaviour
             _value_changed = knob_control(_label, _p_value, _v_min, _v_max, _v_default, _radius);
 
             label = _label;
@@ -121,7 +122,6 @@ namespace ImGuiKnobs {
             v_max = _v_max;
             v_default = _v_default;
             radius = _radius;
-            screen_pos = _screen_pos;
             value_changed = _value_changed;
             center = {screen_pos[0] + radius, screen_pos[1] + radius};
             is_active = ImGui::IsItemActive();
@@ -196,22 +196,25 @@ namespace ImGuiKnobs {
             auto width = size == 0 ? ImGui::GetTextLineHeight() * 4.0f : size * ImGui::GetIO().FontGlobalScale;
             ImGui::PushItemWidth(width);
 
+            ImGui::BeginGroup();
+
+            // There's an issue with `SameLine` and Groups, see https://github.com/ocornut/imgui/issues/4190.
+            // This is probably not the best solution, but seems to work for now
+            ImGui::GetCurrentWindow()->DC.CurrLineTextBaseOffset = 0;
+
             // Draw title
             auto title_size = ImGui::CalcTextSize(label, NULL, false, width);
-            auto old_cursor_pos = ImGui::GetCursorPos();
 
             // Center title
-            ImGui::SetCursorPos({old_cursor_pos[0] + (width - title_size[0]) * 0.5f, old_cursor_pos[1]});
+            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (width - title_size[0]) * 0.5f);
 
             ImGui::Text("%s", label);
-
-            // Reset cursor X
-            ImGui::SetCursorPosX(old_cursor_pos[0]);
 
             knob k(label, p_value, v_min, v_max, v_default, width * 0.5f);
 
             ImGui::DragScalar("###knob_drag", ImGuiDataType_Float, p_value, (v_max - v_min) / 1000.f, &v_min, &v_max, format);
 
+            ImGui::EndGroup();
             ImGui::PopItemWidth();
             ImGui::PopID();
             return k;

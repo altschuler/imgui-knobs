@@ -36,7 +36,6 @@ namespace ImGuiKnobs {
             float v_max;
             float v_default;
             float radius;
-            ImVec2 screen_pos;
             bool value_changed;
             ImVec2 center;
             bool is_active;
