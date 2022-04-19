@@ -284,8 +284,8 @@ namespace ImGuiKnobs {
 
     KNOB_WIDGET(TickKnob) {
         auto knob = detail::knob_with_drag(title, p_value, v_min, v_max, 0, format, size, flags);
-        knob.draw_circle(0.7, detail::GetSecondaryColorSet(), true, 32);
-        knob.draw_tick(0.4, 0.7, 0.08, knob.angle, detail::GetPrimaryColorSet());
+        knob.draw_circle(0.85, detail::GetSecondaryColorSet(), true, 32);
+        knob.draw_tick(0.5, 0.85, 0.08, knob.angle, detail::GetPrimaryColorSet());
         return knob.value_changed;
     }
 
