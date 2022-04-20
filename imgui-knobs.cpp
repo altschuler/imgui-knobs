@@ -116,7 +116,11 @@ namespace ImGuiKnobs {
                 value_changed = true;
             } else if (is_active && delta[axis] != 0.0) {
                 auto step = (v_max - v_min) / speed;
-                *p_value -= delta[axis] * step;
+                if (axis == 0) { // X/left decrease
+                    *p_value += delta[axis] * step;
+                } else { // Y/down decrease
+                    *p_value -= delta[axis] * step;
+                } 
                 if (*p_value < v_min) {
                     *p_value = v_min;
                 }
