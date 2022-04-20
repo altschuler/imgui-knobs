@@ -85,6 +85,32 @@ namespace ImGuiKnobs {
             // Maybe this should be configurable
             auto speed = io.KeyShift ? 2000.0f : 200.0f;
 
+            ImGui::SetItemUsingMouseWheel();
+
+            if (ImGui::IsItemHovered())
+            {
+                float wheel = ImGui::GetIO().MouseWheel;
+                if (wheel)
+                {
+                    if (ImGui::IsItemActive())
+                    {
+                        ImGui::ClearActiveID();
+                    }
+                    else
+                    {
+                        auto step = (v_max - v_min) / speed;                
+                        *p_value += wheel * step; // TODO: step resolution to be adjustable (very fine / fine / coarse)
+                        if (*p_value < v_min) {
+                            *p_value = v_min;
+                        }
+                        if (*p_value > v_max) {
+                            *p_value = v_max;
+                        }
+                        value_changed = true;
+                    }
+                }
+            }
+         
             if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left) && is_active) {
                 *p_value = v_default;
                 value_changed = true;
@@ -105,6 +131,7 @@ namespace ImGuiKnobs {
 
             return value_changed;
         }
+
 
         knob::knob(const char *_label, float *_p_value, float _v_min, float _v_max, float _v_default, float _radius, int _axis) {
             auto _angle_min = M_PI * 0.75;
