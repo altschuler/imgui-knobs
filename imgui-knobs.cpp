@@ -1,8 +1,9 @@
-#include "knobs.h"
+#include "imgui-knobs.h"
 
 #include <cmath>
 #include <cstdlib>
 #include <imgui.h>
+#define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui_internal.h>
 #include <utility>
 
@@ -71,7 +72,7 @@ namespace ImGuiKnobs {
                     num_segments);
         }
 
-        bool knob_control(const char *id, float *p_value, float v_min, float v_max, float v_default, float radius) {
+        bool knob_control(const char *id, float *p_value, float v_min, float v_max, float v_default, float radius, int axis = 0) {
             ImGui::InvisibleButton(id, {radius * 2.0f, radius * 2.0f});
 
             auto value_changed = false;
@@ -87,9 +88,9 @@ namespace ImGuiKnobs {
             if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left) && is_active) {
                 *p_value = v_default;
                 value_changed = true;
-            } else if (is_active && delta[1] != 0.0) {
+            } else if (is_active && delta[axis] != 0.0) {
                 auto step = (v_max - v_min) / speed;
-                *p_value -= delta[1] * step;
+                *p_value -= delta[axis] * step;
                 if (*p_value < v_min) {
                     *p_value = v_min;
                 }
@@ -105,16 +106,17 @@ namespace ImGuiKnobs {
             return value_changed;
         }
 
-        knob::knob(const char *_label, float *_p_value, float _v_min, float _v_max, float _v_default, float _radius) {
+        knob::knob(const char *_label, float *_p_value, float _v_min, float _v_max, float _v_default, float _radius, int _axis) {
             auto _angle_min = M_PI * 0.75;
             auto _angle_max = M_PI * 2.25;
             auto _t = (*_p_value - _v_min) / (_v_max - _v_min);
             auto _angle = _angle_min + (_angle_max - _angle_min) * _t;
             auto _value_changed = false;
             auto screen_pos = ImGui::GetCursorScreenPos();
+            axis = _axis;
 
             // Make an invisble button that handles drag behaviour
-            _value_changed = knob_control(_label, _p_value, _v_min, _v_max, _v_default, _radius);
+            _value_changed = knob_control(_label, _p_value, _v_min, _v_max, _v_default, _radius, _axis);
 
             label = _label;
             p_value = _p_value;
@@ -133,7 +135,7 @@ namespace ImGuiKnobs {
             angle_cos = cosf(angle);
             angle_sin = sinf(angle);
         }
-
+ 
         void knob::draw_dot(float size, float radius, float angle, color_set color, bool filled, int segments) {
             auto dot_size = size * this->radius;
             auto dot_radius = radius * this->radius;
@@ -195,6 +197,7 @@ namespace ImGuiKnobs {
             ImGui::PushID(label);
             auto width = size == 0 ? ImGui::GetTextLineHeight() * 4.0f : size * ImGui::GetIO().FontGlobalScale;
             ImGui::PushItemWidth(width);
+            auto axis = (flags & ImGuiKnobFlags_DragX) ? 0 : 1;
 
             ImGui::BeginGroup();
 
@@ -212,7 +215,7 @@ namespace ImGuiKnobs {
                 ImGui::Text("%s", label);
             }
 
-            knob k(label, p_value, v_min, v_max, v_default, width * 0.5f);
+            knob k(label, p_value, v_min, v_max, v_default, width * 0.5f, axis);
 
             if (flags & ImGuiKnobFlags_ValueTooltip && (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled) || ImGui::IsItemActive())) {
                 ImGui::BeginTooltip();
@@ -223,7 +226,6 @@ namespace ImGuiKnobs {
             if (!(flags & ImGuiKnobFlags_NoInput)) {
                 ImGui::DragScalar("###knob_drag", ImGuiDataType_Float, p_value, (v_max - v_min) / 1000.f, &v_min, &v_max, format);
             }
-
             ImGui::EndGroup();
             ImGui::PopItemWidth();
             ImGui::PopID();

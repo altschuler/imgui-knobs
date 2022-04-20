@@ -11,7 +11,8 @@ typedef int ImGuiKnobFlags;
 enum ImGuiKnobFlags_ {
     ImGuiKnobFlags_NoTitle = 1 << 0,
     ImGuiKnobFlags_NoInput = 1 << 1,
-    ImGuiKnobFlags_ValueTooltip = 1 << 2
+    ImGuiKnobFlags_ValueTooltip = 1 << 2,
+    ImGuiKnobFlags_DragX = 1 << 3
 };
 
 namespace ImGuiKnobs {
@@ -55,8 +56,9 @@ namespace ImGuiKnobs {
             float angle;
             float angle_cos;
             float angle_sin;
+            int axis; // 0 = x, 1 = y
 
-            knob(const char *_label, float *_p_value, float _v_min, float _v_max, float _v_default, float _radius);
+            knob(const char *_label, float *_p_value, float _v_min, float _v_max, float _v_default, float _radius, int _axis);
 
             void draw_dot(float size, float radius, float angle, color_set color, bool filled, int segments);
             void draw_tick(float start, float end, float width, float angle, color_set color);
