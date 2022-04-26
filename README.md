@@ -1,36 +1,39 @@
 # ImGui Knobs
-This is a port/adaptation of [imgui-rs-knobs](https://github.com/DGriffin91/imgui-rs-knobs), for C++ with slightly changed API.
+This is a port/adaptation of [imgui-rs-knobs](https://github.com/DGriffin91/imgui-rs-knobs), for C++.
 
 ![image](https://user-images.githubusercontent.com/956928/164050142-96a8dde4-7d2e-43e4-9afe-14ab48eac243.png)
 
 ## Usage
-Add `imgui-knobs.cpp` and `imgui-knobs.h` to your project and include `imgui-knobs.h` in some source file, then:
+Add `imgui-knobs.cpp` and `imgui-knobs.h` to your project and include `imgui-knobs.h` in some source file.
+
 
 ```cpp
 static float value = 0;
 
-if (ImGuiKnobs::WiperKnob("Volume", &value, -6.0f, 6.0f, "%.1fdB")) {
+if (ImGuiKnobs::Knob("Volume", &value, -6.0f, 6.0f, 0.1f, "%.1fdB", ImGuiKnobVariant_Tick)) {
     // value was changed
 }
 ```
 
-Available knob variants are: `TickKnob`, `DotKnob`, `WiperKnob`, `WiperOnlyKnob`, `WiperDotKnob`, `SteppedKnob`, `SpaceKnob`. They differ only in their visual appearance.
+Draw knobs using either `Knob` or `KnobInt`. The API is:
+
+```
+bool ImGuiKnobs::Knob(label, *value, min, max, speed, [format, variant, size, flags, steps])
+bool ImGuiKnobs::KnobInt(label, *value, min, max, speed, [format, variant, size, flags, steps])
+```
+
+### Variants
+`variant` determines the visual look of the knob. Available variants are: `ImGuiKnobVariant_Tick`, `ImGuiKnobVariant_Dot`, `ImGuiKnobVariant_Wiper`, `ImGuiKnobVariant_WiperOnly`, `ImGuiKnobVariant_WiperDot`, `ImGuiKnobVariant_Stepped`, `ImGuiKnobVariant_Space`.
+
+### Flags
+ - `ImGuiKnobFlags_NoTitle`: Hide the top title.
+ - `ImGuiKnobFlags_NoInput`: Hide the bottom drag input.
+ - `ImGuiKnobFlags_ValueTooltip`: Show a tooltip with the current value on hover.
+ - `ImGuiKnobFlags_DragHorizontal`: Use horizontal dragging (default is vertical).
 
 ### Size
 You can specify a size given as the width of the knob (will be scaled according to ImGui's `FontGlobalScale`). Default (0) will use 4x line height.
 
-```cpp
-// Draw a knob that is 80px wide
-ImGuiKnobs::WiperKnob("Volume", &value, -6.0f, 6.0f, "%.1fdB", 80);
-```
-
-### Flags
-There are flags to hide the title, hide the input and to show the current value in a tooltip when the knob is hovered.
-
-```cpp
-ImGuiKnobs::WiperKnob("No title", &value, -6.0f, 6.0f, "%.1fdB", 0, ImGuiKnobFlags_NoTitle);
-
-ImGuiKnobs::DotKnob("Pitch", &value, 0, 2, "%.1f", 0, ImGuiKnobFlags_NoInput | ImGuiKnobFlags_NoTitle | ImGuiKnobFlags_ValueTooltip);
-```
-
+### Steps
+Steps determines the number of steps draw, it is only used for the `ImGuiKnobVariant_Stepped` variant.
 

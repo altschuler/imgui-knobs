@@ -1,13 +1,27 @@
 #pragma once
 
 #include <imgui.h>
+#include <cstdlib>
 
 typedef int ImGuiKnobFlags;
 
 enum ImGuiKnobFlags_ {
     ImGuiKnobFlags_NoTitle = 1 << 0,
     ImGuiKnobFlags_NoInput = 1 << 1,
-    ImGuiKnobFlags_ValueTooltip = 1 << 2
+    ImGuiKnobFlags_ValueTooltip = 1 << 2,
+    ImGuiKnobFlags_DragHorizontal = 1 << 3,
+};
+
+typedef int ImGuiKnobVariant;
+
+enum ImGuiKnobVariant_ {
+    ImGuiKnobVariant_Tick = 1 << 0,
+    ImGuiKnobVariant_Dot = 1 << 1,
+    ImGuiKnobVariant_Wiper = 1 << 2,
+    ImGuiKnobVariant_WiperOnly = 1 << 3,
+    ImGuiKnobVariant_WiperDot = 1 << 4,
+    ImGuiKnobVariant_Stepped = 1 << 5,
+    ImGuiKnobVariant_Space = 1 << 6,
 };
 
 namespace ImGuiKnobs {
@@ -16,8 +30,6 @@ namespace ImGuiKnobs {
         ImColor base;
         ImColor hovered;
         ImColor active;
-
-        color_set(){};
 
         color_set(ImColor base, ImColor hovered, ImColor active) : base(base), hovered(hovered), active(active) {}
 
@@ -28,11 +40,6 @@ namespace ImGuiKnobs {
         }
     };
 
-    bool TickKnob(const char *title, float *p_value, float v_min, float v_max, const char *format, float size = 0, ImGuiKnobFlags flags = 0);
-    bool DotKnob(const char *title, float *p_value, float v_min, float v_max, const char *format, float size = 0, ImGuiKnobFlags flags = 0);
-    bool WiperKnob(const char *title, float *p_value, float v_min, float v_max, const char *format, float size = 0, ImGuiKnobFlags flags = 0);
-    bool WiperOnlyKnob(const char *title, float *p_value, float v_min, float v_max, const char *format, float size = 0, ImGuiKnobFlags flags = 0);
-    bool WiperDotKnob(const char *title, float *p_value, float v_min, float v_max, const char *format, float size = 0, ImGuiKnobFlags flags = 0);
-    bool SteppedKnob(const char *title, float *p_value, float v_min, float v_max, const char *format, float size = 0, ImGuiKnobFlags flags = 0, int steps = 10);
-    bool SpaceKnob(const char *title, float *p_value, float v_min, float v_max, const char *format, float size = 0, ImGuiKnobFlags flags = 0);
+    bool Knob(const char *label, float *p_value, float v_min, float v_max, float speed = 1.f, const char *format = NULL, ImGuiKnobVariant variant = ImGuiKnobVariant_Tick, float size = 0, ImGuiKnobFlags flags = 0, int steps = 10);
+    bool KnobInt(const char *label, int *p_value, int v_min, int v_max, float speed = 1.f, const char *format = NULL, ImGuiKnobVariant variant = ImGuiKnobVariant_Tick, float size = 0, ImGuiKnobFlags flags = 0, int steps = 10);
 }// namespace ImGuiKnobs
