@@ -5,6 +5,8 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 
+#define IMGUIKNOBS_PI 3.14159265358979323846
+
 namespace ImGuiKnobs {
     namespace detail {
         void draw_arc1(ImVec2 center, float radius, float start_angle, float end_angle, float thickness, ImColor color, int num_segments) {
@@ -36,7 +38,7 @@ namespace ImGuiKnobs {
 
         void draw_arc(ImVec2 center, float radius, float start_angle, float end_angle, float thickness, ImColor color, int num_segments, int bezier_count) {
             // Overlap and angle of ends of bezier curves needs work, only looks good when not transperant
-            auto overlap = thickness * radius * 0.00001f * M_PI;
+            auto overlap = thickness * radius * 0.00001f * IMGUIKNOBS_PI;
             auto delta = end_angle - start_angle;
             auto bez_step = 1.0f / bezier_count;
             auto mid_angle = start_angle + overlap;
@@ -78,8 +80,8 @@ namespace ImGuiKnobs {
                 }
                 value_changed = ImGui::DragBehavior(gid, data_type, p_value, speed, &v_min, &v_max, format, drag_flags);
 
-                angle_min = M_PI * 0.75;
-                angle_max = M_PI * 2.25;
+                angle_min = IMGUIKNOBS_PI * 0.75;
+                angle_max = IMGUIKNOBS_PI * 2.25;
                 center = {screen_pos[0] + radius, screen_pos[1] + radius};
                 is_active = ImGui::IsItemActive();
                 is_hovered = ImGui::IsItemHovered();
@@ -160,7 +162,7 @@ namespace ImGuiKnobs {
             }
 
             // Draw knob
-            knob k(label, data_type, p_value, v_min, v_max, speed, width * 0.5f, format, flags);
+            knob<DataType> k(label, data_type, p_value, v_min, v_max, speed, width * 0.5f, format, flags);
 
             // Draw tooltip
             if (flags & ImGuiKnobFlags_ValueTooltip && (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled) || ImGui::IsItemActive())) {
@@ -181,6 +183,7 @@ namespace ImGuiKnobs {
             ImGui::EndGroup();
             ImGui::PopItemWidth();
             ImGui::PopID();
+
             return k;
         }
 
@@ -192,8 +195,18 @@ namespace ImGuiKnobs {
 
         color_set GetSecondaryColorSet() {
             auto *colors = ImGui::GetStyle().Colors;
-            auto active = colors[ImGuiCol_ButtonActive] * ImVec4(0.5f, 0.5f, 0.5f, 1.f);
-            auto hovered = colors[ImGuiCol_ButtonHovered] * ImVec4(0.5f, 0.5f, 0.5f, 1.f);
+            auto active = ImVec4(
+                    colors[ImGuiCol_ButtonActive].x * 0.5f,
+                    colors[ImGuiCol_ButtonActive].y * 0.5f,
+                    colors[ImGuiCol_ButtonActive].z * 0.5f,
+                    colors[ImGuiCol_ButtonActive].w);
+
+            auto hovered = ImVec4(
+                    colors[ImGuiCol_ButtonHovered].x * 0.5f,
+                    colors[ImGuiCol_ButtonHovered].y * 0.5f,
+                    colors[ImGuiCol_ButtonHovered].z * 0.5f,
+                    colors[ImGuiCol_ButtonHovered].w);
+
             return {active, hovered, hovered};
         }
 
