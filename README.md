@@ -18,8 +18,8 @@ if (ImGuiKnobs::Knob("Volume", &value, -6.0f, 6.0f, 0.1f, "%.1fdB", ImGuiKnobVar
 Draw knobs using either `Knob` or `KnobInt`. The API is:
 
 ```
-bool ImGuiKnobs::Knob(label, *value, min, max, speed, [format, variant, size, flags, steps])
-bool ImGuiKnobs::KnobInt(label, *value, min, max, speed, [format, variant, size, flags, steps])
+bool ImGuiKnobs::Knob(label, *value, min, max, [speed, format, variant, size, flags, steps])
+bool ImGuiKnobs::KnobInt(label, *value, min, max, [speed, format, variant, size, flags, steps])
 ```
 
 ### Variants
