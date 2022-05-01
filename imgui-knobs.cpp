@@ -75,7 +75,7 @@ namespace ImGuiKnobs {
                 ImGui::InvisibleButton(_label, {radius * 2.0f, radius * 2.0f});
                 auto gid = ImGui::GetID(_label);
                 ImGuiSliderFlags drag_flags = 0;
-                if (flags ^ ImGuiKnobFlags_DragHorizontal) {
+                if (!(flags & ImGuiKnobFlags_DragHorizontal)) {
                     drag_flags |= ImGuiSliderFlags_Vertical;
                 }
                 value_changed = ImGui::DragBehavior(gid, data_type, p_value, speed, &v_min, &v_max, format, drag_flags);
@@ -153,7 +153,7 @@ namespace ImGuiKnobs {
             ImGui::GetCurrentWindow()->DC.CurrLineTextBaseOffset = 0;
 
             // Draw title
-            if (flags ^ ImGuiKnobFlags_NoTitle) {
+            if (!(flags & ImGuiKnobFlags_NoTitle)) {
                 auto title_size = ImGui::CalcTextSize(label, NULL, false, width);
 
                 // Center title
@@ -173,9 +173,9 @@ namespace ImGuiKnobs {
             }
 
             // Draw input
-            if (flags ^ ImGuiKnobFlags_NoInput) {
+            if (!(flags & ImGuiKnobFlags_NoInput)) {
                 ImGuiSliderFlags drag_flags = 0;
-                if (flags ^ ImGuiKnobFlags_DragHorizontal) {
+                if (!(flags & ImGuiKnobFlags_DragHorizontal)) {
                     drag_flags |= ImGuiSliderFlags_Vertical;
                 }
                 ImGui::DragScalar("###knob_drag", data_type, p_value, speed, &v_min, &v_max, format, drag_flags);
