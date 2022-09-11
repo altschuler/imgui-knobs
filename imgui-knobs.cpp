@@ -178,7 +178,10 @@ namespace ImGuiKnobs {
                 if (!(flags & ImGuiKnobFlags_DragHorizontal)) {
                     drag_flags |= ImGuiSliderFlags_Vertical;
                 }
-                ImGui::DragScalar("###knob_drag", data_type, p_value, speed, &v_min, &v_max, format, drag_flags);
+                auto changed = ImGui::DragScalar("###knob_drag", data_type, p_value, speed, &v_min, &v_max, format, drag_flags);
+                if (changed) {
+                    k.value_changed = true;
+                }
             }
 
             ImGui::EndGroup();
