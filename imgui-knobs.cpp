@@ -9,6 +9,46 @@
 
 namespace ImGuiKnobs {
     namespace detail {
+
+
+
+    //Re-maps a number from one range to another.
+    //Numbers outside the range are not clamped to 0 and 1.
+    template<typename T>
+    inline T Map(const T& aValue,const T& aIStart,const T& aIStop,const T& aOStart,const T& aOStop)
+    {
+      return aOStart + (aOStop - aOStart) * ((aValue - aIStart) / (aIStop - aIStart));
+    }
+
+
+    // Re-Maps clamped
+    template<typename T>
+    inline T MapC(const T& aValue,const T& aIStart,const T& aIStop,const T& aOStart,const T& aOStop)
+    {
+      if(aValue<=aIStart)
+        {
+          return aOStart;
+        }
+      else if(aValue>=aIStop)
+        {
+          return aOStop;
+        }
+      return Map<T>(aValue,aIStart,aIStop,aOStart,aOStop);
+    }
+
+    inline float GetAngle(const ImVec2& aPos,const ImVec2& aMousePos)
+    {
+      ImVec2 dir(aMousePos.x-aPos.x,aMousePos.y-aPos.y);
+      float angle=atan2(-dir.y,-dir.x);
+      angle+=(3.141592f*2.5f);
+      angle=fmod(angle,3.141592f*2.0f);
+
+      return angle;
+    }
+
+
+
+
         void draw_arc1(ImVec2 center, float radius, float start_angle, float end_angle, float thickness, ImColor color, int num_segments) {
             ImVec2 start = {
                     center[0] + cosf(start_angle) * radius,
@@ -66,23 +106,120 @@ namespace ImGuiKnobs {
             float angle_cos;
             float angle_sin;
 
+
+            bool WrapAround(DataType p_value,DataType prev_value, DataType v_min, DataType v_max) const noexcept
+            {
+              static const float epsilon=0.05f;
+
+              if(   (p_value>=v_max*(1.0f-epsilon) && prev_value<=v_min*(1.0f+epsilon))
+                 || (p_value<=v_min*(1.0f+epsilon) && prev_value>=v_max*(1.0f-epsilon))
+                )
+                {
+                  return true;
+                }
+
+              return false;
+            }
+
+            bool RotateBehavior(DataType *p_value, DataType v_min, DataType v_max,float speed,bool absolute_rot)
+            {
+              ImGuiIO& imgui_io=ImGui::GetIO();
+
+
+              if(absolute_rot)
+                {
+                  ImVec2 mouse_pos=imgui_io.MousePos;
+                  float input_angle=GetAngle(center,mouse_pos);
+                  DataType prev_value=*p_value;
+
+                  *p_value=MapC(input_angle,0.25f*3.141592f,1.75f*3.141592f,1.0f*v_min,1.0f*v_max);
+
+                  if( WrapAround(*p_value,prev_value,v_min,v_max) || fabs(*p_value-prev_value)>(v_min+v_max)*0.75f)
+                    {
+                      *p_value=prev_value;
+                    }
+
+                  value_changed=(prev_value!=*p_value);
+                }
+              else
+                {
+                  ImVec2 mouse_pos,mouse_pos_prev;
+
+                  if(imgui_io.MouseDownDuration[0]>0.0f)
+                    {
+                      mouse_pos=imgui_io.MousePos;
+
+                      mouse_pos_prev=imgui_io.MousePos;
+                      mouse_pos_prev.x-=imgui_io.MouseDelta.x;
+                      mouse_pos_prev.y-=imgui_io.MouseDelta.y;
+                    }
+                  else
+                    {
+                      mouse_pos=imgui_io.MouseClickedPos[0];
+                      mouse_pos_prev=imgui_io.MouseClickedPos[0];
+                    }
+
+                  float input_angle_prev=GetAngle(center,mouse_pos_prev);
+                  float input_angle=GetAngle(center,mouse_pos);
+
+                  if(input_angle_prev!=input_angle)
+                    {
+                      DataType prev_value=*p_value;
+                      //if(!speed)  // speed == 0 is changed in knob_with_drag
+                        {
+                          DataType r=(v_max-v_min)*IMGUIKNOBS_PI*0.4f;
+                          speed=r;
+                        }
+
+                      *p_value+=MapC(input_angle-input_angle_prev,-2.0f*IMGUIKNOBS_PI,2.0f*IMGUIKNOBS_PI,-speed,speed);
+                      if (*p_value < v_min)
+                          *p_value = v_min;
+                      if (*p_value > v_max)
+                          *p_value = v_max;
+
+                      if(WrapAround(*p_value,prev_value,v_min,v_max)  || fabs(input_angle-input_angle_prev)>IMGUIKNOBS_PI)
+                        {
+                          *p_value=prev_value;
+                          value_changed=false;
+                        }
+                      else
+                        {
+                          value_changed=true;
+                        }
+                    }
+                  else
+                    {
+                      value_changed=false;
+                    }
+                }
+
+              return value_changed;
+            }
+
+
             knob(const char *_label, ImGuiDataType data_type, DataType *p_value, DataType v_min, DataType v_max, float speed, float _radius, const char *format, ImGuiKnobFlags flags) {
                 radius = _radius;
                 t = ((float) *p_value - v_min) / (v_max - v_min);
                 auto screen_pos = ImGui::GetCursorScreenPos();
+                center = {screen_pos[0] + radius, screen_pos[1] + radius};
 
                 // Handle dragging
                 ImGui::InvisibleButton(_label, {radius * 2.0f, radius * 2.0f});
                 auto gid = ImGui::GetID(_label);
                 ImGuiSliderFlags drag_flags = 0;
-                if (!(flags & ImGuiKnobFlags_DragHorizontal)) {
+                if((flags & (ImGuiKnobFlags_RotateRelative|ImGuiKnobFlags_RotateAbsolute))) {
+                  value_changed = RotateBehavior(p_value, v_min, v_max,speed,flags==ImGuiKnobFlags_RotateAbsolute);
+                  }
+                else{
+                  if (!(flags & ImGuiKnobFlags_DragHorizontal))
                     drag_flags |= ImGuiSliderFlags_Vertical;
+
+                  value_changed = ImGui::DragBehavior(gid, data_type, p_value, speed, &v_min, &v_max, format, drag_flags);
                 }
-                value_changed = ImGui::DragBehavior(gid, data_type, p_value, speed, &v_min, &v_max, format, drag_flags);
+
 
                 angle_min = IMGUIKNOBS_PI * 0.75f;
                 angle_max = IMGUIKNOBS_PI * 2.25f;
-                center = {screen_pos[0] + radius, screen_pos[1] + radius};
                 is_active = ImGui::IsItemActive();
                 is_hovered = ImGui::IsItemHovered();
                 angle = angle_min + (angle_max - angle_min) * t;
