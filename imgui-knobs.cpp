@@ -11,43 +11,26 @@ namespace ImGuiKnobs {
     namespace detail {
 
 
-
-    //Re-maps a number from one range to another.
-    //Numbers outside the range are not clamped to 0 and 1.
-    template<typename T>
-    inline T Map(const T& aValue,const T& aIStart,const T& aIStop,const T& aOStart,const T& aOStop)
-    {
-      return aOStart + (aOStop - aOStart) * ((aValue - aIStart) / (aIStop - aIStart));
-    }
-
-
-    // Re-Maps clamped
-    template<typename T>
-    inline T MapC(const T& aValue,const T& aIStart,const T& aIStop,const T& aOStart,const T& aOStop)
-    {
-      if(aValue<=aIStart)
-        {
-          return aOStart;
+        // Re-Maps clamped
+        template<typename T>
+        inline T map_range_clamped(const T& value, const T& in_start, const T& in_stop, const T& out_start, const T& out_stop) {
+            if (value <= in_start) {
+                return out_start;
+            }
+            else if (value >= in_stop) {
+              return out_stop;
+            }
+            return out_start + (out_stop - out_start) * ((value - in_start) / (in_stop - in_start));
         }
-      else if(aValue>=aIStop)
-        {
-          return aOStop;
+
+        inline float get_angle(const ImVec2& point1, const ImVec2& point2) {
+            ImVec2 dir(point2.x - point1.x, point2.y - point1.y);
+            float angle = atan2(-dir.y, -dir.x);
+            angle += (IMGUIKNOBS_PI * 2.5f);
+            angle = fmod(angle, IMGUIKNOBS_PI * 2.0f);
+
+            return angle;
         }
-      return Map<T>(aValue,aIStart,aIStop,aOStart,aOStop);
-    }
-
-    inline float GetAngle(const ImVec2& aPos,const ImVec2& aMousePos)
-    {
-      ImVec2 dir(aMousePos.x-aPos.x,aMousePos.y-aPos.y);
-      float angle=atan2(-dir.y,-dir.x);
-      angle+=(3.141592f*2.5f);
-      angle=fmod(angle,3.141592f*2.0f);
-
-      return angle;
-    }
-
-
-
 
         void draw_arc1(ImVec2 center, float radius, float start_angle, float end_angle, float thickness, ImColor color, int num_segments) {
             ImVec2 start = {
@@ -107,93 +90,78 @@ namespace ImGuiKnobs {
             float angle_sin;
 
 
-            bool WrapAround(DataType p_value,DataType prev_value, DataType v_min, DataType v_max) const noexcept
-            {
-              static const float epsilon=0.05f;
+            bool wrap_around(DataType p_value,DataType prev_value, DataType v_min, DataType v_max) const noexcept {
+                static const float epsilon = 0.05f;
 
-              if(   (p_value>=v_max*(1.0f-epsilon) && prev_value<=v_min*(1.0f+epsilon))
-                 || (p_value<=v_min*(1.0f+epsilon) && prev_value>=v_max*(1.0f-epsilon))
-                )
-                {
-                  return true;
+                if (   (p_value >= v_max * (1.0f - epsilon) && prev_value <= v_min * (1.0f + epsilon))
+                    || (p_value <= v_min * (1.0f + epsilon) && prev_value >= v_max * (1.0f - epsilon))) {
+                    return true;
                 }
 
-              return false;
+                return false;
             }
 
-            bool RotateBehavior(DataType *p_value, DataType v_min, DataType v_max,float speed,bool absolute_rot)
-            {
-              ImGuiIO& imgui_io=ImGui::GetIO();
+            bool rotate_behavior(DataType *p_value, DataType v_min, DataType v_max,float speed,bool absolute_rot) {
+                ImGuiIO& imgui_io=ImGui::GetIO();
 
+                if (absolute_rot) {
+                    ImVec2 mouse_pos = imgui_io.MousePos;
+                    float input_angle = get_angle(center ,mouse_pos);
+                    DataType prev_value = *p_value;
 
-              if(absolute_rot)
-                {
-                  ImVec2 mouse_pos=imgui_io.MousePos;
-                  float input_angle=GetAngle(center,mouse_pos);
-                  DataType prev_value=*p_value;
+                    *p_value = static_cast<DataType>(map_range_clamped(input_angle, 0.25f * IMGUIKNOBS_PI, 1.75f * IMGUIKNOBS_PI, 1.0f * v_min, 1.0f * v_max));
 
-                  *p_value=MapC(input_angle,0.25f*3.141592f,1.75f*3.141592f,1.0f*v_min,1.0f*v_max);
-
-                  if( WrapAround(*p_value,prev_value,v_min,v_max) || fabs(*p_value-prev_value)>(v_min+v_max)*0.75f)
-                    {
-                      *p_value=prev_value;
+                    if( wrap_around(*p_value, prev_value, v_min, v_max) || fabs(*p_value - prev_value) > (v_min + v_max) * 0.75f) {
+                        *p_value = prev_value;
                     }
 
-                  value_changed=(prev_value!=*p_value);
+                    value_changed = (prev_value != *p_value);
                 }
-              else
-                {
-                  ImVec2 mouse_pos,mouse_pos_prev;
+                else {
+                    ImVec2 mouse_pos, mouse_pos_prev;
 
-                  if(imgui_io.MouseDownDuration[0]>0.0f)
-                    {
-                      mouse_pos=imgui_io.MousePos;
+                    if (imgui_io.MouseDownDuration[0] > 0.0f) {
+                        mouse_pos = imgui_io.MousePos;
 
-                      mouse_pos_prev=imgui_io.MousePos;
-                      mouse_pos_prev.x-=imgui_io.MouseDelta.x;
-                      mouse_pos_prev.y-=imgui_io.MouseDelta.y;
+                        mouse_pos_prev = imgui_io.MousePos;
+                        mouse_pos_prev.x -= imgui_io.MouseDelta.x;
+                        mouse_pos_prev.y -= imgui_io.MouseDelta.y;
                     }
-                  else
-                    {
-                      mouse_pos=imgui_io.MouseClickedPos[0];
-                      mouse_pos_prev=imgui_io.MouseClickedPos[0];
+                    else {
+                        mouse_pos = imgui_io.MouseClickedPos[0];
+                        mouse_pos_prev = imgui_io.MouseClickedPos[0];
                     }
 
-                  float input_angle_prev=GetAngle(center,mouse_pos_prev);
-                  float input_angle=GetAngle(center,mouse_pos);
+                    float input_angle_prev = get_angle(center,mouse_pos_prev);
+                    float input_angle = get_angle(center,mouse_pos);
 
-                  if(input_angle_prev!=input_angle)
-                    {
-                      DataType prev_value=*p_value;
-                      //if(!speed)  // speed == 0 is changed in knob_with_drag
+                    if (input_angle_prev != input_angle) {
+                        DataType prev_value = *p_value;
+                        //if (!speed)  // speed == 0 is changed in knob_with_drag.
                         {
-                          DataType r=(v_max-v_min)*IMGUIKNOBS_PI*0.4f;
-                          speed=r;
+                            speed = (v_max-v_min) * IMGUIKNOBS_PI * 0.4f;
                         }
 
-                      *p_value+=MapC(input_angle-input_angle_prev,-2.0f*IMGUIKNOBS_PI,2.0f*IMGUIKNOBS_PI,-speed,speed);
-                      if (*p_value < v_min)
-                          *p_value = v_min;
-                      if (*p_value > v_max)
-                          *p_value = v_max;
+                       *p_value += static_cast<DataType>(map_range_clamped(input_angle - input_angle_prev, -2.0f * IMGUIKNOBS_PI, 2.0f * IMGUIKNOBS_PI, -speed, speed));
+                       if (*p_value < v_min)
+                           *p_value = v_min;
+                       if (*p_value > v_max)
+                           *p_value = v_max;
 
-                      if(WrapAround(*p_value,prev_value,v_min,v_max)  || fabs(input_angle-input_angle_prev)>IMGUIKNOBS_PI)
-                        {
-                          *p_value=prev_value;
-                          value_changed=false;
-                        }
-                      else
-                        {
-                          value_changed=true;
-                        }
+                       if (wrap_around(*p_value, prev_value, v_min, v_max)  || fabs(input_angle - input_angle_prev) > IMGUIKNOBS_PI) {
+                           *p_value = prev_value;
+                           value_changed = false;
+                       }
+                       else {
+                            value_changed = true;
+                       }
                     }
-                  else
-                    {
-                      value_changed=false;
+                    else {
+                        value_changed = false;
                     }
                 }
 
-              return value_changed;
+                return value_changed;
             }
 
 
@@ -207,14 +175,14 @@ namespace ImGuiKnobs {
                 ImGui::InvisibleButton(_label, {radius * 2.0f, radius * 2.0f});
                 auto gid = ImGui::GetID(_label);
                 ImGuiSliderFlags drag_flags = 0;
-                if((flags & (ImGuiKnobFlags_RotateRelative|ImGuiKnobFlags_RotateAbsolute))) {
-                  value_changed = RotateBehavior(p_value, v_min, v_max,speed,flags==ImGuiKnobFlags_RotateAbsolute);
-                  }
-                else{
-                  if (!(flags & ImGuiKnobFlags_DragHorizontal))
-                    drag_flags |= ImGuiSliderFlags_Vertical;
+                if((flags & (ImGuiKnobFlags_RotateRelative | ImGuiKnobFlags_RotateAbsolute))) {
+                    value_changed = rotate_behavior(p_value, v_min, v_max, speed, flags == ImGuiKnobFlags_RotateAbsolute);
+                }
+                else {
+                    if (!(flags & ImGuiKnobFlags_DragHorizontal))
+                        drag_flags |= ImGuiSliderFlags_Vertical;
 
-                  value_changed = ImGui::DragBehavior(gid, data_type, p_value, speed, &v_min, &v_max, format, drag_flags);
+                    value_changed = ImGui::DragBehavior(gid, data_type, p_value, speed, &v_min, &v_max, format, drag_flags);
                 }
 
 
