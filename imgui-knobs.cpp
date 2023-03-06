@@ -101,8 +101,19 @@ namespace ImGuiKnobs {
                 return false;
             }
 
-            bool rotate_behavior(DataType *p_value, DataType v_min, DataType v_max,float speed,bool absolute_rot) {
+            bool rotate_behavior(ImGuiID id,DataType *p_value, DataType v_min, DataType v_max,float speed,bool absolute_rot) {
                 ImGuiIO& imgui_io=ImGui::GetIO();
+
+                ImGuiContext& g = *GImGui;
+                if (g.ActiveId == id) {
+                    if (g.ActiveIdSource == ImGuiInputSource_Mouse && !g.IO.MouseDown[0])
+                        ImGui::ClearActiveID();
+                    else if (g.ActiveIdSource == ImGuiInputSource_Nav && g.NavActivatePressedId == id && !g.ActiveIdIsJustActivated)
+                        ImGui::ClearActiveID();
+                }
+
+                if (g.ActiveId != id)
+                    return false;
 
                 if (absolute_rot) {
                     ImVec2 mouse_pos = imgui_io.MousePos;
@@ -174,11 +185,12 @@ namespace ImGuiKnobs {
                 // Handle dragging
                 ImGui::InvisibleButton(_label, {radius * 2.0f, radius * 2.0f});
                 auto gid = ImGui::GetID(_label);
-                ImGuiSliderFlags drag_flags = 0;
+
                 if((flags & (ImGuiKnobFlags_RotateRelative | ImGuiKnobFlags_RotateAbsolute))) {
-                    value_changed = rotate_behavior(p_value, v_min, v_max, speed, flags == ImGuiKnobFlags_RotateAbsolute);
+                    value_changed = rotate_behavior(gid,p_value, v_min, v_max, speed, flags == ImGuiKnobFlags_RotateAbsolute);
                 }
                 else {
+                    ImGuiSliderFlags drag_flags = 0;
                     if (!(flags & ImGuiKnobFlags_DragHorizontal))
                         drag_flags |= ImGuiSliderFlags_Vertical;
 
