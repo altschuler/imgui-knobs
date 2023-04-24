@@ -1,6 +1,8 @@
 #pragma once
 
 #include <cstdlib>
+
+#define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
 
 typedef int ImGuiKnobFlags;

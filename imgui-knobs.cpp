@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <cstdlib>
+#define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
 #include <imgui_internal.h>
 
@@ -56,7 +57,7 @@ namespace ImGuiKnobs {
 
             auto *draw_list = ImGui::GetWindowDrawList();
 
-            draw_list->AddBezierCurve(start, arc1, arc2, end, color, thickness, num_segments);
+            draw_list->AddBezierCubic(start, arc1, arc2, end, color, thickness, num_segments);
         }
 
         void draw_arc(ImVec2 center, float radius, float start_angle, float end_angle, float thickness, ImColor color, int num_segments, int bezier_count) {
@@ -108,7 +109,7 @@ namespace ImGuiKnobs {
                 if (g.ActiveId == id) {
                     if (g.ActiveIdSource == ImGuiInputSource_Mouse && !g.IO.MouseDown[0])
                         ImGui::ClearActiveID();
-                    else if (g.ActiveIdSource == ImGuiInputSource_Nav && g.NavActivatePressedId == id && !g.ActiveIdIsJustActivated)
+                    else if ((g.ActiveIdSource == ImGuiInputSource_Keyboard || g.ActiveIdSource == ImGuiInputSource_Gamepad) && g.NavActivatePressedId == id && !g.ActiveIdIsJustActivated)
                         ImGui::ClearActiveID();
                 }
 
