@@ -44,6 +44,7 @@ namespace ImGuiKnobs {
         }
     };
 
-    bool Knob(const char *label, float *p_value, float v_min, float v_max, float speed = 0, const char *format = NULL, ImGuiKnobVariant variant = ImGuiKnobVariant_Tick, float size = 0, ImGuiKnobFlags flags = 0, int steps = 10);
+    bool Knob(const char *label, float *p_value, float v_min, float v_max, float speed = 0, const char *format = NULL, ImGuiKnobVariant variant = ImGuiKnobVariant_Tick, float size = 0, ImGuiKnobFlags flags = 0, int steps = 10
+              ,float aAngleMin=3.14159265358979323846f*0.75f,float aAngleMax=3.14159265358979323846f*2.25f);
     bool KnobInt(const char *label, int *p_value, int v_min, int v_max, float speed = 0, const char *format = NULL, ImGuiKnobVariant variant = ImGuiKnobVariant_Tick, float size = 0, ImGuiKnobFlags flags = 0, int steps = 10);
 }// namespace ImGuiKnobs
