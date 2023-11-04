@@ -189,7 +189,7 @@ namespace ImGuiKnobs {
                 auto gid = ImGui::GetID(_label);
 
                 if((flags & (ImGuiKnobFlags_RotateRelative | ImGuiKnobFlags_RotateAbsolute))) {
-                    value_changed = rotate_behavior(gid,p_value, v_min, v_max, speed, flags == ImGuiKnobFlags_RotateAbsolute);
+                    value_changed = rotate_behavior(gid,p_value, v_min, v_max, speed, flags & ImGuiKnobFlags_RotateAbsolute);
                 }
                 else {
                     ImGuiSliderFlags drag_flags = 0;

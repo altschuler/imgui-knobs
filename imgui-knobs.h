@@ -14,6 +14,7 @@ enum ImGuiKnobFlags_ {
     ImGuiKnobFlags_DragHorizontal = 1 << 3,
     ImGuiKnobFlags_RotateRelative = 1 << 4,
     ImGuiKnobFlags_RotateAbsolute = 1 << 5,
+    ImGuiKnobFlags_WrapAround = 1 << 6,
 };
 
 typedef int ImGuiKnobVariant;
