@@ -1,5 +1,5 @@
 # ImGui Knobs
-This is a port/adaptation of [imgui-rs-knobs](https://github.com/DGriffin91/imgui-rs-knobs), for C++.
+I have made some changes to [imgui-knobs](https://github.com/altschuler/imgui-knobs), which is a port/adaptation of [imgui-rs-knobs](https://github.com/DGriffin91/imgui-rs-knobs), for C++.
 
 ![image](https://user-images.githubusercontent.com/956928/164050142-96a8dde4-7d2e-43e4-9afe-14ab48eac243.png)
 
@@ -18,7 +18,7 @@ if (ImGuiKnobs::Knob("Volume", &value, -6.0f, 6.0f, 0.1f, "%.1fdB", ImGuiKnobVar
 Draw knobs using either `Knob` or `KnobInt`. The API is:
 
 ```
-bool ImGuiKnobs::Knob(label, *value, min, max, [speed, format, variant, size, flags, steps])
+bool ImGuiKnobs::Knob(label, *value, min, max, [speed, format, variant, size, flags, steps, angle_min, angle_max])
 bool ImGuiKnobs::KnobInt(label, *value, min, max, [speed, format, variant, size, flags, steps])
 ```
 
@@ -30,6 +30,9 @@ bool ImGuiKnobs::KnobInt(label, *value, min, max, [speed, format, variant, size,
  - `ImGuiKnobFlags_NoInput`: Hide the bottom drag input.
  - `ImGuiKnobFlags_ValueTooltip`: Show a tooltip with the current value on hover.
  - `ImGuiKnobFlags_DragHorizontal`: Use horizontal dragging (default is vertical).
+ - `ImGuiKnobFlags_RotateRelative`: Use rotate relative dragging.
+ - `ImGuiKnobFlags_RotateAbsolute`: Use rotate absolute dragging.
+ - `ImGuiKnobFlags_WrapAround`: Values wraparound when using the "rotate" flags.
 
 ### Size
 You can specify a size given as the width of the knob (will be scaled according to ImGui's `FontGlobalScale`). Default (0) will use 4x line height.
