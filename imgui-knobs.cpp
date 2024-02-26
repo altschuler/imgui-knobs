@@ -8,6 +8,29 @@
 #define IMGUIKNOBS_PI 3.14159265358979323846f
 
 namespace ImGuiKnobs {
+    struct ImGuiKnobsContext
+    {
+        bool set = false;
+        float start_angle = 0.75f;
+        float end_angle = 2.25f;
+    };
+
+    static ImGuiKnobsContext imGuiKnobsContext;
+
+    void SetStartAndEndAngle(float start_angle, float end_angle)
+    {
+        imGuiKnobsContext.set = true;
+        imGuiKnobsContext.start_angle = start_angle;
+        imGuiKnobsContext.end_angle = end_angle;
+    }
+
+    void SetStartAndEndAngleDeg(float start_angle, float end_angle)
+    {
+        imGuiKnobsContext.set = true;
+        imGuiKnobsContext.start_angle = start_angle * (1.0f / 180.0f);
+        imGuiKnobsContext.end_angle = end_angle * (1.0f / 180.0f);
+    }
+
     namespace detail {
         void draw_arc1(ImVec2 center, float radius, float start_angle, float end_angle, float thickness, ImColor color, int num_segments) {
             ImVec2 start = {
@@ -83,8 +106,18 @@ namespace ImGuiKnobs {
                 }
                 value_changed = ImGui::DragBehavior(gid, data_type, p_value, speed, &v_min, &v_max, format, drag_flags);
 
-                angle_min = IMGUIKNOBS_PI * 0.75f;
-                angle_max = IMGUIKNOBS_PI * 2.25f;
+                if (!imGuiKnobsContext.set)
+                {
+                    angle_min = IMGUIKNOBS_PI * 0.75f;
+                    angle_max = IMGUIKNOBS_PI * 2.25f;
+                }
+                else
+                {
+                    imGuiKnobsContext.set = false;
+                    angle_min = IMGUIKNOBS_PI * imGuiKnobsContext.start_angle;
+                    angle_max = IMGUIKNOBS_PI * imGuiKnobsContext.end_angle;
+                }
+
                 center = {screen_pos[0] + radius, screen_pos[1] + radius};
                 is_active = ImGui::IsItemActive();
                 is_hovered = ImGui::IsItemHovered();
