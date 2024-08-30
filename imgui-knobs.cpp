@@ -9,68 +9,11 @@
 
 namespace ImGuiKnobs {
     namespace detail {
-        void draw_arc1(
-                ImVec2 center,
-                float radius,
-                float start_angle,
-                float end_angle,
-                float thickness,
-                ImColor color,
-                int num_segments) {
-
-            ImVec2 start = {
-                    center[0] + cosf(start_angle) * radius,
-                    center[1] + sinf(start_angle) * radius,
-            };
-
-            ImVec2 end = {
-                    center[0] + cosf(end_angle) * radius,
-                    center[1] + sinf(end_angle) * radius,
-            };
-
-            // Calculate bezier arc points
-            auto ax = start[0] - center[0];
-            auto ay = start[1] - center[1];
-            auto bx = end[0] - center[0];
-            auto by = end[1] - center[1];
-            auto q1 = ax * ax + ay * ay;
-            auto q2 = q1 + ax * bx + ay * by;
-            auto k2 = (4.0f / 3.0f) * (sqrtf((2.0f * q1 * q2)) - q2) / (ax * by - ay * bx);
-            auto arc1 = ImVec2{center[0] + ax - k2 * ay, center[1] + ay + k2 * ax};
-            auto arc2 = ImVec2{center[0] + bx + k2 * by, center[1] + by - k2 * bx};
-
+        void draw_arc(ImVec2 center, float radius, float start_angle, float end_angle, float thickness, ImColor color) {
             auto *draw_list = ImGui::GetWindowDrawList();
 
-#if IMGUI_VERSION_NUM <= 18000
-            draw_list->AddBezierCurve(start, arc1, arc2, end, color, thickness, num_segments);
-#else
-            draw_list->AddBezierCubic(start, arc1, arc2, end, color, thickness, num_segments);
-#endif
-        }
-
-        void draw_arc(
-                ImVec2 center,
-                float radius,
-                float start_angle,
-                float end_angle,
-                float thickness,
-                ImColor color,
-                int num_segments,
-                int bezier_count) {
-            // Overlap and angle of ends of bezier curves needs work, only looks good when
-            // not transperant
-            auto overlap = thickness * radius * 0.00001f * IMGUIKNOBS_PI;
-            auto delta = end_angle - start_angle;
-            auto bez_step = 1.0f / bezier_count;
-            auto mid_angle = start_angle + overlap;
-
-            for (auto i = 0; i < bezier_count - 1; i++) {
-                auto mid_angle2 = delta * bez_step + mid_angle;
-                draw_arc1(center, radius, mid_angle - overlap, mid_angle2 + overlap, thickness, color, num_segments);
-                mid_angle = mid_angle2;
-            }
-
-            draw_arc1(center, radius, mid_angle - overlap, end_angle, thickness, color, num_segments);
+            draw_list->PathArcTo(center, radius, start_angle, end_angle);
+            draw_list->PathStroke(color, 0, thickness);
         }
 
         template<typename DataType>
@@ -154,11 +97,11 @@ namespace ImGuiKnobs {
                         is_active ? color.active : (is_hovered ? color.hovered : color.base));
             }
 
-            void draw_arc(float radius, float size, float start_angle, float end_angle, color_set color, int segments, int bezier_count) {
+            void draw_arc(float radius, float size, float start_angle, float end_angle, color_set color) {
                 auto track_radius = radius * this->radius;
                 auto track_size = size * this->radius * 0.5f + 0.0001f;
 
-                detail::draw_arc(center, track_radius, start_angle, end_angle, track_size, is_active ? color.active : (is_hovered ? color.hovered : color.base), segments, bezier_count);
+                detail::draw_arc(center, track_radius, start_angle, end_angle, track_size, is_active ? color.active : (is_hovered ? color.hovered : color.base));
             }
         };
 
@@ -285,24 +228,24 @@ namespace ImGuiKnobs {
 
             case ImGuiKnobVariant_Wiper: {
                 knob.draw_circle(0.7f, detail::GetSecondaryColorSet(), true, 32);
-                knob.draw_arc(0.8f, 0.41f, knob.angle_min, knob.angle_max, detail::GetTrackColorSet(), 16, 2);
+                knob.draw_arc(0.8f, 0.41f, knob.angle_min, knob.angle_max, detail::GetTrackColorSet());
 
                 if (knob.t > 0.01f) {
-                    knob.draw_arc(0.8f, 0.43f, knob.angle_min, knob.angle, detail::GetPrimaryColorSet(), 16, 2);
+                    knob.draw_arc(0.8f, 0.43f, knob.angle_min, knob.angle, detail::GetPrimaryColorSet());
                 }
                 break;
             }
             case ImGuiKnobVariant_WiperOnly: {
-                knob.draw_arc(0.8f, 0.41f, knob.angle_min, knob.angle_max, detail::GetTrackColorSet(), 32, 2);
+                knob.draw_arc(0.8f, 0.41f, knob.angle_min, knob.angle_max, detail::GetTrackColorSet());
 
                 if (knob.t > 0.01) {
-                    knob.draw_arc(0.8f, 0.43f, knob.angle_min, knob.angle, detail::GetPrimaryColorSet(), 16, 2);
+                    knob.draw_arc(0.8f, 0.43f, knob.angle_min, knob.angle, detail::GetPrimaryColorSet());
                 }
                 break;
             }
             case ImGuiKnobVariant_WiperDot: {
                 knob.draw_circle(0.6f, detail::GetSecondaryColorSet(), true, 32);
-                knob.draw_arc(0.85f, 0.41f, knob.angle_min, knob.angle_max, detail::GetTrackColorSet(), 16, 2);
+                knob.draw_arc(0.85f, 0.41f, knob.angle_min, knob.angle_max, detail::GetTrackColorSet());
                 knob.draw_dot(0.1f, 0.85f, knob.angle, detail::GetPrimaryColorSet(), true, 12);
                 break;
             }
@@ -321,9 +264,9 @@ namespace ImGuiKnobs {
                 knob.draw_circle(0.3f - knob.t * 0.1f, detail::GetSecondaryColorSet(), true, 16);
 
                 if (knob.t > 0.01f) {
-                    knob.draw_arc(0.4f, 0.15f, knob.angle_min - 1.0f, knob.angle - 1.0f, detail::GetPrimaryColorSet(), 16, 2);
-                    knob.draw_arc(0.6f, 0.15f, knob.angle_min + 1.0f, knob.angle + 1.0f, detail::GetPrimaryColorSet(), 16, 2);
-                    knob.draw_arc(0.8f, 0.15f, knob.angle_min + 3.0f, knob.angle + 3.0f, detail::GetPrimaryColorSet(), 16, 2);
+                    knob.draw_arc(0.4f, 0.15f, knob.angle_min - 1.0f, knob.angle - 1.0f, detail::GetPrimaryColorSet());
+                    knob.draw_arc(0.6f, 0.15f, knob.angle_min + 1.0f, knob.angle + 1.0f, detail::GetPrimaryColorSet());
+                    knob.draw_arc(0.8f, 0.15f, knob.angle_min + 3.0f, knob.angle + 3.0f, detail::GetPrimaryColorSet());
                 }
                 break;
             }
