@@ -47,5 +47,16 @@ See `example/main.cpp` for a working demo.
 ### Size
 You can specify a size given as the width of the knob (will be scaled according to ImGui's `FontGlobalScale`). Default (0) will use 4x line height.
 
+### Colors
+By default the knobs are styled using colors from the imgui theme. You can push/pop style colors to change individual colors. The color ids/flags default to button colors, thus:
+
+| ImGui Color | Knob meaning |
+|---|---|
+| `ImGuiCol_ButtonActive` | The "filled" part |
+| `ImGuiCol_ButtonHovered` | The "filled" part, when hovered |
+| `ImGuiCol_Button` | The knob track |
+
+Use `ImGuiCol_FrameBg`/`ImGuiCol_Text` to change the input field colors.
+
 ### Steps
 Steps determines the number of steps draw, it is only used for the `ImGuiKnobVariant_Stepped` variant.

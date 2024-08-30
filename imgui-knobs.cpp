@@ -195,7 +195,7 @@ namespace ImGuiKnobs {
         color_set GetTrackColorSet() {
             auto *colors = ImGui::GetStyle().Colors;
 
-            return {colors[ImGuiCol_FrameBg], colors[ImGuiCol_FrameBg], colors[ImGuiCol_FrameBg]};
+            return {colors[ImGuiCol_Button], colors[ImGuiCol_Button], colors[ImGuiCol_Button]};
         }
     }// namespace detail
 

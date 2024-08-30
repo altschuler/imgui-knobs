@@ -26,22 +26,37 @@ int main(int, char **) {
             ImGui::Begin("Knob knob");
 
             static float val1 = 0;
-
-            if (ImGuiKnobs::Knob("Volume", &val1, -6.0f, 6.0f, 0.1f, "%.1fdB", ImGuiKnobVariant_Tick)) {
+            if (ImGuiKnobs::Knob("Gain", &val1, -6.0f, 6.0f, 0.1f, "%.1fdB", ImGuiKnobVariant_Tick)) {
                 // value was changed
-            }
-
-            // Double click to reset
-            if (ImGui::IsItemActive() && ImGui::IsMouseDoubleClicked(0)) {
-                val1 = 0;
             }
 
             ImGui::SameLine();
 
             static float val2 = 0;
-            if (ImGuiKnobs::Knob("Speed", &val2, -6.0f, 6.0f, 0.1f, "%.1fdB", ImGuiKnobVariant_Stepped)) {
+            if (ImGuiKnobs::Knob("Mix", &val2, -6.0f, 6.0f, 0.1f, "%.1fdB", ImGuiKnobVariant_Stepped)) {
                 // value was changed
             }
+
+            // Double click to reset
+            if (ImGui::IsItemActive() && ImGui::IsMouseDoubleClicked(0)) {
+                val2 = 0;
+            }
+
+
+            ImGui::SameLine();
+
+            static float val3 = 0;
+
+            // Custom colors
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(255.f, 0, 0, 0.7f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(255.f, 0, 0, 1));
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 255.f, 0, 1));
+            // Push/PopStyleColor() for each colors used (namely ImGuiCol_ButtonActive and ImGuiCol_ButtonHovered for primary and ImGuiCol_Framebg for Track)
+            if (ImGuiKnobs::Knob("Pitch", &val3, -6.0f, 6.0f, 0.1f, "%.1fdB", ImGuiKnobVariant_WiperOnly)) {
+                // value was changed
+            }
+
+            ImGui::PopStyleColor(3);
 
             ImGui::End();
         }
