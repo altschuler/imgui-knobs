@@ -25,15 +25,21 @@ int main(int, char **) {
         {
             ImGui::Begin("Knob knob");
 
-            static float value = 0;
+            static float val1 = 0;
 
-            if (ImGuiKnobs::Knob("Volume", &value, -6.0f, 6.0f, 0.1f, "%.1fdB", ImGuiKnobVariant_Tick)) {
+            if (ImGuiKnobs::Knob("Volume", &val1, -6.0f, 6.0f, 0.1f, "%.1fdB", ImGuiKnobVariant_Tick)) {
                 // value was changed
+            }
+
+            // Double click to reset
+            if (ImGui::IsItemActive() && ImGui::IsMouseDoubleClicked(0)) {
+                val1 = 0;
             }
 
             ImGui::SameLine();
 
-            if (ImGuiKnobs::Knob("Volume", &value, -6.0f, 6.0f, 0.1f, "%.1fdB", ImGuiKnobVariant_Stepped)) {
+            static float val2 = 0;
+            if (ImGuiKnobs::Knob("Speed", &val2, -6.0f, 6.0f, 0.1f, "%.1fdB", ImGuiKnobVariant_Stepped)) {
                 // value was changed
             }
 
