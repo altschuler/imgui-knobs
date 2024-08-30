@@ -31,7 +31,8 @@ namespace ImGuiKnobs {
         ImColor hovered;
         ImColor active;
 
-        color_set(ImColor base, ImColor hovered, ImColor active) : base(base), hovered(hovered), active(active) {}
+        color_set(ImColor base, ImColor hovered, ImColor active)
+            : base(base), hovered(hovered), active(active) {}
 
         color_set(ImColor color) {
             base = color;
@@ -40,6 +41,26 @@ namespace ImGuiKnobs {
         }
     };
 
-    bool Knob(const char *label, float *p_value, float v_min, float v_max, float speed = 0, const char *format = NULL, ImGuiKnobVariant variant = ImGuiKnobVariant_Tick, float size = 0, ImGuiKnobFlags flags = 0, int steps = 10);
-    bool KnobInt(const char *label, int *p_value, int v_min, int v_max, float speed = 0, const char *format = NULL, ImGuiKnobVariant variant = ImGuiKnobVariant_Tick, float size = 0, ImGuiKnobFlags flags = 0, int steps = 10);
+    bool Knob(
+            const char *label,
+            float *p_value,
+            float v_min,
+            float v_max,
+            float speed = 0,
+            const char *format = NULL,
+            ImGuiKnobVariant variant = ImGuiKnobVariant_Tick,
+            float size = 0,
+            ImGuiKnobFlags flags = 0,
+            int steps = 10);
+    bool KnobInt(
+            const char *label,
+            int *p_value,
+            int v_min,
+            int v_max,
+            float speed = 0,
+            const char *format = NULL,
+            ImGuiKnobVariant variant = ImGuiKnobVariant_Tick,
+            float size = 0,
+            ImGuiKnobFlags flags = 0,
+            int steps = 10);
 }// namespace ImGuiKnobs

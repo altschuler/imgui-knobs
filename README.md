@@ -22,6 +22,8 @@ bool ImGuiKnobs::Knob(label, *value, min, max, [speed, format, variant, size, fl
 bool ImGuiKnobs::KnobInt(label, *value, min, max, [speed, format, variant, size, flags, steps])
 ```
 
+See `example/main.cpp` for a working demo.
+
 ### Variants
 `variant` determines the visual look of the knob. Available variants are: `ImGuiKnobVariant_Tick`, `ImGuiKnobVariant_Dot`, `ImGuiKnobVariant_Wiper`, `ImGuiKnobVariant_WiperOnly`, `ImGuiKnobVariant_WiperDot`, `ImGuiKnobVariant_Stepped`, `ImGuiKnobVariant_Space`.
 
@@ -36,4 +38,3 @@ You can specify a size given as the width of the knob (will be scaled according 
 
 ### Steps
 Steps determines the number of steps draw, it is only used for the `ImGuiKnobVariant_Stepped` variant.
-

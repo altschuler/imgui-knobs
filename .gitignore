@@ -1,0 +1,5 @@
+*.gch
+*.o
+*.ini
+example/imgui_knobs_example
+/.ccls-cache
