@@ -47,20 +47,24 @@ namespace ImGuiKnobs {
             float v_min,
             float v_max,
             float speed = 0,
-            const char *format = NULL,
+            const char *format = "%.3f",
             ImGuiKnobVariant variant = ImGuiKnobVariant_Tick,
             float size = 0,
             ImGuiKnobFlags flags = 0,
-            int steps = 10);
+            int steps = 10,
+            float angle_min = -1,
+            float angle_max = -1);
     bool KnobInt(
             const char *label,
             int *p_value,
             int v_min,
             int v_max,
             float speed = 0,
-            const char *format = NULL,
+            const char *format = "%i",
             ImGuiKnobVariant variant = ImGuiKnobVariant_Tick,
             float size = 0,
             ImGuiKnobFlags flags = 0,
-            int steps = 10);
+            int steps = 10,
+            float angle_min = -1,
+            float angle_max = -1);
 }// namespace ImGuiKnobs

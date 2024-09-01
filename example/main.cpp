@@ -33,7 +33,7 @@ int main(int, char **) {
             ImGui::SameLine();
 
             static float val2 = 0;
-            if (ImGuiKnobs::Knob("Mix", &val2, -6.0f, 6.0f, 0.1f, "%.1fdB", ImGuiKnobVariant_Stepped)) {
+            if (ImGuiKnobs::Knob("Mix", &val2, -1.0f, 1.0f, 0.1f, "%.1f", ImGuiKnobVariant_Stepped)) {
                 // value was changed
             }
 
@@ -52,11 +52,29 @@ int main(int, char **) {
             ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(255.f, 0, 0, 1));
             ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 255.f, 0, 1));
             // Push/PopStyleColor() for each colors used (namely ImGuiCol_ButtonActive and ImGuiCol_ButtonHovered for primary and ImGuiCol_Framebg for Track)
-            if (ImGuiKnobs::Knob("Pitch", &val3, -6.0f, 6.0f, 0.1f, "%.1fdB", ImGuiKnobVariant_WiperOnly)) {
+            if (ImGuiKnobs::Knob("Pitch", &val3, -6.0f, 6.0f, 0.1f, "%.1f", ImGuiKnobVariant_WiperOnly)) {
                 // value was changed
             }
 
             ImGui::PopStyleColor(3);
+
+
+            ImGui::SameLine();
+
+            // Custom min/max angle
+            static float val4 = 0;
+            if (ImGuiKnobs::Knob("Dry", &val4, -6.0f, 6.0f, 0.1f, "%.1f", ImGuiKnobVariant_Stepped, 0, 0, 10, 1.570796f, 3.141592f)) {
+                // value was changed
+            }
+
+            ImGui::SameLine();
+
+            // Int value
+            static int val5 = 1;
+            if (ImGuiKnobs::KnobInt("Wet", &val5, 1, 10, 0.1f, "%i", ImGuiKnobVariant_Stepped, 0, 0, 10)) {
+                // value was changed
+            }
+
 
             ImGui::End();
         }

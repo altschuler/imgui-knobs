@@ -38,7 +38,9 @@ namespace ImGuiKnobs {
                  float speed,
                  float _radius,
                  const char *format,
-                 ImGuiKnobFlags flags) {
+                 ImGuiKnobFlags flags,
+                 float _angle_min,
+                 float _angle_max) {
                 radius = _radius;
                 t = ((float) *p_value - v_min) / (v_max - v_min);
                 auto screen_pos = ImGui::GetCursorScreenPos();
@@ -52,8 +54,9 @@ namespace ImGuiKnobs {
                 }
                 value_changed = ImGui::DragBehavior(gid, data_type, p_value, speed, &v_min, &v_max, format, drag_flags);
 
-                angle_min = IMGUIKNOBS_PI * 0.75f;
-                angle_max = IMGUIKNOBS_PI * 2.25f;
+                angle_min = _angle_min < 0 ? IMGUIKNOBS_PI * 0.75f : _angle_min;
+                angle_max = _angle_max < 0 ? IMGUIKNOBS_PI * 2.25f : _angle_max;
+
                 center = {screen_pos[0] + radius, screen_pos[1] + radius};
                 is_active = ImGui::IsItemActive();
                 is_hovered = ImGui::IsItemHovered();
@@ -115,11 +118,12 @@ namespace ImGuiKnobs {
                 float _speed,
                 const char *format,
                 float size,
-                ImGuiKnobFlags flags) {
+                ImGuiKnobFlags flags,
+                float angle_min,
+                float angle_max) {
             auto speed = _speed == 0 ? (v_max - v_min) / 250.f : _speed;
             ImGui::PushID(label);
-            auto width = size == 0 ? ImGui::GetTextLineHeight() * 4.0f
-                                   : size * ImGui::GetIO().FontGlobalScale;
+            auto width = size == 0 ? ImGui::GetTextLineHeight() * 4.0f : size * ImGui::GetIO().FontGlobalScale;
             ImGui::PushItemWidth(width);
 
             ImGui::BeginGroup();
@@ -141,7 +145,7 @@ namespace ImGuiKnobs {
             }
 
             // Draw knob
-            knob<DataType> k(label, data_type, p_value, v_min, v_max, speed, width * 0.5f, format, flags);
+            knob<DataType> k(label, data_type, p_value, v_min, v_max, speed, width * 0.5f, format, flags, angle_min, angle_max);
 
             // Draw tooltip
             if (flags & ImGuiKnobFlags_ValueTooltip &&
@@ -211,8 +215,21 @@ namespace ImGuiKnobs {
             ImGuiKnobVariant variant,
             float size,
             ImGuiKnobFlags flags,
-            int steps = 10) {
-        auto knob = detail::knob_with_drag(label, data_type, p_value, v_min, v_max, speed, format, size, flags);
+            int steps,
+            float angle_min,
+            float angle_max) {
+        auto knob = detail::knob_with_drag(
+                label,
+                data_type,
+                p_value,
+                v_min,
+                v_max,
+                speed,
+                format,
+                size,
+                flags,
+                angle_min,
+                angle_max);
 
         switch (variant) {
             case ImGuiKnobVariant_Tick: {
@@ -285,9 +302,23 @@ namespace ImGuiKnobs {
             ImGuiKnobVariant variant,
             float size,
             ImGuiKnobFlags flags,
-            int steps) {
-        const char *_format = format == NULL ? "%.3f" : format;
-        return BaseKnob(label, ImGuiDataType_Float, p_value, v_min, v_max, speed, _format, variant, size, flags, steps);
+            int steps,
+            float angle_min,
+            float angle_max) {
+        return BaseKnob(
+                label,
+                ImGuiDataType_Float,
+                p_value,
+                v_min,
+                v_max,
+                speed,
+                format,
+                variant,
+                size,
+                flags,
+                steps,
+                angle_min,
+                angle_max);
     }
 
     bool KnobInt(
@@ -300,9 +331,23 @@ namespace ImGuiKnobs {
             ImGuiKnobVariant variant,
             float size,
             ImGuiKnobFlags flags,
-            int steps) {
-        const char *_format = format == NULL ? "%i" : format;
-        return BaseKnob(label, ImGuiDataType_S32, p_value, v_min, v_max, speed, _format, variant, size, flags, steps);
+            int steps,
+            float angle_min,
+            float angle_max) {
+        return BaseKnob(
+                label,
+                ImGuiDataType_S32,
+                p_value,
+                v_min,
+                v_max,
+                speed,
+                format,
+                variant,
+                size,
+                flags,
+                steps,
+                angle_min,
+                angle_max);
     }
 
 }// namespace ImGuiKnobs

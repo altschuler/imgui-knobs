@@ -18,8 +18,8 @@ if (ImGuiKnobs::Knob("Volume", &value, -6.0f, 6.0f, 0.1f, "%.1fdB", ImGuiKnobVar
 Draw knobs using either `Knob` or `KnobInt`. The API is:
 
 ```
-bool ImGuiKnobs::Knob(label, *value, min, max, [speed, format, variant, size, flags, steps])
-bool ImGuiKnobs::KnobInt(label, *value, min, max, [speed, format, variant, size, flags, steps])
+bool ImGuiKnobs::Knob(label, *value, min, max, [speed, format, variant, size, flags, steps, angle_min, angle_max])
+bool ImGuiKnobs::KnobInt(label, *value, min, max, [speed, format, variant, size, flags, steps, angle_min, angle_max])
 ```
 
 You can implement **double click to reset** using standard imgui functionality:
@@ -33,7 +33,7 @@ if (ImGui::IsItemActive() && ImGui::IsMouseDoubleClicked(0)) {
 }
 ```
 
-See `example/main.cpp` for a working demo.
+See `example/main.cpp` for a demo.
 
 ### Variants
 `variant` determines the visual look of the knob. Available variants are: `ImGuiKnobVariant_Tick`, `ImGuiKnobVariant_Dot`, `ImGuiKnobVariant_Wiper`, `ImGuiKnobVariant_WiperOnly`, `ImGuiKnobVariant_WiperDot`, `ImGuiKnobVariant_Stepped`, `ImGuiKnobVariant_Space`.
