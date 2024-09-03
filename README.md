@@ -42,7 +42,8 @@ See `example/main.cpp` for a demo.
  - `ImGuiKnobFlags_NoTitle`: Hide the top title.
  - `ImGuiKnobFlags_NoInput`: Hide the bottom drag input.
  - `ImGuiKnobFlags_ValueTooltip`: Show a tooltip with the current value on hover.
- - `ImGuiKnobFlags_DragHorizontal`: Use horizontal dragging (default is vertical).
+ - `ImGuiKnobFlags_DragHorizontal`: Use horizontal dragging only (default is bi-directional).
+ - `ImGuiKnobFlags_DragVertical`: Use vertical dragging only (default is bi-directional).
 
 ### Size
 You can specify a size given as the width of the knob (will be scaled according to ImGui's `FontGlobalScale`). Default (0) will use 4x line height.

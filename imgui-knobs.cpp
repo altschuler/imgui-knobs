@@ -47,12 +47,24 @@ namespace ImGuiKnobs {
 
                 // Handle dragging
                 ImGui::InvisibleButton(_label, {radius * 2.0f, radius * 2.0f});
+
+                // Handle drag: if DragVertical or DragHorizontal flags are set, only the given direction is
+                // used, otherwise use the drag direction with the highest delta
+                ImGuiIO &io = ImGui::GetIO();
+                bool drag_vertical =
+                        !(flags & ImGuiKnobFlags_DragHorizontal) &&
+                        (flags & ImGuiKnobFlags_DragVertical || ImAbs(io.MouseDelta[ImGuiAxis_Y]) > ImAbs(io.MouseDelta[ImGuiAxis_X]));
+
                 auto gid = ImGui::GetID(_label);
-                ImGuiSliderFlags drag_flags = 0;
-                if (!(flags & ImGuiKnobFlags_DragHorizontal)) {
-                    drag_flags |= ImGuiSliderFlags_Vertical;
-                }
-                value_changed = ImGui::DragBehavior(gid, data_type, p_value, speed, &v_min, &v_max, format, drag_flags);
+                value_changed = ImGui::DragBehavior(
+                        gid,
+                        data_type,
+                        p_value,
+                        speed,
+                        &v_min,
+                        &v_max,
+                        format,
+                        drag_vertical ? ImGuiSliderFlags_Vertical : 0);
 
                 angle_min = _angle_min < 0 ? IMGUIKNOBS_PI * 0.75f : _angle_min;
                 angle_max = _angle_max < 0 ? IMGUIKNOBS_PI * 2.25f : _angle_max;
@@ -158,11 +170,7 @@ namespace ImGuiKnobs {
 
             // Draw input
             if (!(flags & ImGuiKnobFlags_NoInput)) {
-                ImGuiSliderFlags drag_flags = 0;
-                if (!(flags & ImGuiKnobFlags_DragHorizontal)) {
-                    drag_flags |= ImGuiSliderFlags_Vertical;
-                }
-                auto changed = ImGui::DragScalar("###knob_drag", data_type, p_value, speed, &v_min, &v_max, format, drag_flags);
+                auto changed = ImGui::DragScalar("###knob_drag", data_type, p_value, speed, &v_min, &v_max, format);
                 if (changed) {
                     k.value_changed = true;
                 }
@@ -349,5 +357,4 @@ namespace ImGuiKnobs {
                 angle_min,
                 angle_max);
     }
-
 }// namespace ImGuiKnobs

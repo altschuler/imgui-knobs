@@ -75,6 +75,14 @@ int main(int, char **) {
                 // value was changed
             }
 
+            ImGui::SameLine();
+
+            // Vertical drag only
+            static float val6 = 1;
+            if (ImGuiKnobs::Knob("Vertical", &val6, 0.f, 10.f, 0.1f, "%.1f", ImGuiKnobVariant_Space, 0, ImGuiKnobFlags_DragVertical)) {
+                // value was changed
+            }
+
 
             ImGui::End();
         }
