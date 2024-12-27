@@ -71,6 +71,4 @@ namespace ImGuiKnobs {
             float angle_min = -1,
             float angle_max = -1);
 
-    void ShowDemoWindow(bool *p_open);
-
 }// namespace ImGuiKnobs
