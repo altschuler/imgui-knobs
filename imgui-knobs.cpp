@@ -7,6 +7,8 @@
 
 #define IMGUIKNOBS_PI 3.14159265358979323846f
 
+static inline float ImLog(int x) { return ImLog(static_cast<float>(x)); }
+
 namespace ImGuiKnobs {
     namespace detail {
         void draw_arc(ImVec2 center, float radius, float start_angle, float end_angle, float thickness, ImColor color) {
@@ -43,8 +45,8 @@ namespace ImGuiKnobs {
                  float _angle_max) {
                 radius = _radius;
                 if (flags & ImGuiKnobFlags_Logarithmic) {
-                    float v = std::max(std::min(*p_value, v_max), v_min);
-                    t = (std::log10(std::abs(v)) - std::log10(std::abs(v_min))) / (std::log10(std::abs(v_max)) - std::log10(std::abs(v_min)));
+                    float v = ImMax(ImMin(*p_value, v_max), v_min);
+                    t = (ImLog(ImAbs(v)) - ImLog(ImAbs(v_min))) / (ImLog(ImAbs(v_max)) - ImLog(ImAbs(v_min)));
                 } else {
                     t = ((float) *p_value - v_min) / (v_max - v_min);
                 }
@@ -154,8 +156,8 @@ namespace ImGuiKnobs {
                 const bool is_floating_point = (data_type == ImGuiDataType_Float) || (data_type == ImGuiDataType_Double);
                 const int decimal_precision = is_floating_point ? ImParseFormatPrecision(format, 3) : 1;
                 v_min = ImPow(0.1f, (float) decimal_precision);
-                v_max = std::max(v_min, v_max); // this ensures that in the cornercase v_max is still at least ge v_min
-                *p_value = std::max(std::min(*p_value, v_max), v_min); // this ensures that in the cornercase p_value is within the range
+                v_max = ImMax(v_min, v_max); // this ensures that in the cornercase v_max is still at least ge v_min
+                *p_value = ImMax(ImMin(*p_value, v_max), v_min); // this ensures that in the cornercase p_value is within the range
             }
 
             auto speed = _speed == 0 ? (v_max - v_min) / 250.f : _speed;
