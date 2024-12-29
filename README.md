@@ -44,6 +44,8 @@ See `example/main.cpp` for a demo.
  - `ImGuiKnobFlags_ValueTooltip`: Show a tooltip with the current value on hover.
  - `ImGuiKnobFlags_DragHorizontal`: Use horizontal dragging only (default is bi-directional).
  - `ImGuiKnobFlags_DragVertical`: Use vertical dragging only (default is bi-directional).
+ - `ImGuiKnobFlags_AlwaysClamp`: Clamp input values that the user types into the input field. If not set, it's possible to override the min/max range via the input field.
+ - `ImGuiKnobFlags_Logarithmic`: Use logarithmic scale for the knob (otherwise linear).
 
 ### Size
 You can specify a size given as the width of the knob (will be scaled according to ImGui's `FontGlobalScale`). Default (0) will use 4x line height.
