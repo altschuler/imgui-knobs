@@ -11,6 +11,8 @@ enum ImGuiKnobFlags_ {
     ImGuiKnobFlags_ValueTooltip = 1 << 2,
     ImGuiKnobFlags_DragHorizontal = 1 << 3,
     ImGuiKnobFlags_DragVertical = 1 << 4,
+    ImGuiKnobFlags_Logarithmic = 1 << 5,
+    ImGuiKnobFlags_AlwaysClamp = 1 << 6
 };
 
 typedef int ImGuiKnobVariant;
@@ -68,4 +70,5 @@ namespace ImGuiKnobs {
             int steps = 10,
             float angle_min = -1,
             float angle_max = -1);
+
 }// namespace ImGuiKnobs
