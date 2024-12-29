@@ -67,7 +67,7 @@ namespace ImGuiKnobs {
                 if (drag_vertical) {
                     drag_behaviour_flags |= ImGuiSliderFlags_Vertical;
                 }
-                if (!(flags & ImGuiKnobFlags_NoAlwaysClamp)) {
+                if (flags & ImGuiKnobFlags_AlwaysClamp) {
                     drag_behaviour_flags |= ImGuiSliderFlags_AlwaysClamp;
                 }
                 if (flags & ImGuiKnobFlags_Logarithmic) {
@@ -198,7 +198,7 @@ namespace ImGuiKnobs {
             // Draw input
             if (!(flags & ImGuiKnobFlags_NoInput)) {
                 ImGuiSliderFlags drag_scalar_flags = 0;
-                if (!(flags & ImGuiKnobFlags_NoAlwaysClamp)) {
+                if (flags & ImGuiKnobFlags_AlwaysClamp) {
                     drag_scalar_flags |= ImGuiSliderFlags_AlwaysClamp;
                 }
                 if (flags & ImGuiKnobFlags_Logarithmic) {

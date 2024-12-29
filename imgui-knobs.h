@@ -12,7 +12,7 @@ enum ImGuiKnobFlags_ {
     ImGuiKnobFlags_DragHorizontal = 1 << 3,
     ImGuiKnobFlags_DragVertical = 1 << 4,
     ImGuiKnobFlags_Logarithmic = 1 << 5,
-    ImGuiKnobFlags_NoAlwaysClamp = 1 << 6
+    ImGuiKnobFlags_AlwaysClamp = 1 << 6
 };
 
 typedef int ImGuiKnobVariant;
